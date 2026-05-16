@@ -1,0 +1,12 @@
+.env
+agent.db
+logs/
+.agent.lock
+venv/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.log
