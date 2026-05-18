@@ -31,7 +31,7 @@ def generate_daily_report(force: bool = False) -> ReportResult:
     articles = gather_all_sources()
     if not articles:
         content = (
-            f"*Daily AI Report - {today}*\n\n"
+            f"Daily AI Report - {today}\n\n"
             "No fresh articles were found. Check internet connectivity or try /report later."
         )
         report_id = save_report(today, content)
@@ -39,7 +39,7 @@ def generate_daily_report(force: bool = False) -> ReportResult:
 
     articles = enrich_articles(articles)
     summary = summarize_articles(articles)
-    content = f"*Daily AI Report - {date.today().strftime('%B %d, %Y')}*\n\n{summary}"
+    content = f"Daily AI Report - {date.today().strftime('%B %d, %Y')}\n\n{summary}"
     report_id = save_report(today, content)
     logger.info("Report saved with id %s.", report_id)
     return ReportResult(report_id=report_id, content=content, created_new=True)

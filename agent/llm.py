@@ -16,7 +16,7 @@ def build_system_prompt() -> str:
     return (
         f"You are an expert AI and technology news reporter. Today is {date.today()}.\n"
         "Create a concise Telegram-ready daily report from the provided articles.\n"
-        "Use simple Markdown compatible with Telegram. Avoid unsupported tables.\n"
+        "Use plain text only. Do not use Markdown, HTML, tables, or unmatched formatting symbols.\n"
         "Structure the report with: top headlines, key details, why it matters, and links.\n"
         "Prefer concrete product names, model names, organizations, and dates.\n"
         "Do not invent facts. If the source text is thin, say what is known from the source.\n"
@@ -59,7 +59,8 @@ def summarize_articles(articles: list[dict[str, str]]) -> str:
 
     content = (
         "Write today's AI/tech news report using these article notes. "
-        "Rank the most important items first and include source links.\n\n"
+        "Rank the most important items first and include source links. "
+        "Return plain text only, with simple headings and bullets.\n\n"
         + "\n\n---\n\n".join(article_blocks)
     )
     return ask_llm([{"role": "user", "content": content}])
