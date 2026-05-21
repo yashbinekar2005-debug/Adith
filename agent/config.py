@@ -21,6 +21,13 @@ def _int_env(name: str, default: int) -> int:
         raise RuntimeError(f"{name} must be an integer, got {raw!r}") from exc
 
 
+def _bool_env(name: str, default: bool) -> bool:
+    raw = os.getenv(name)
+    if raw is None or raw == "":
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+
 @dataclass(frozen=True)
 class Settings:
     telegram_bot_token: str | None
@@ -33,6 +40,10 @@ class Settings:
     rss_limit_per_feed: int
     ddg_results_per_query: int
     request_timeout_seconds: int
+    ollama_startup_wait_seconds: int
+    stop_ollama_after_report: bool
+    telegram_send_retries: int
+    telegram_retry_delay_seconds: int
 
 
 settings = Settings(
@@ -46,6 +57,10 @@ settings = Settings(
     rss_limit_per_feed=_int_env("RSS_LIMIT_PER_FEED", 3),
     ddg_results_per_query=_int_env("DDG_RESULTS_PER_QUERY", 3),
     request_timeout_seconds=_int_env("REQUEST_TIMEOUT_SECONDS", 120),
+    ollama_startup_wait_seconds=_int_env("OLLAMA_STARTUP_WAIT_SECONDS", 45),
+    stop_ollama_after_report=_bool_env("STOP_OLLAMA_AFTER_REPORT", True),
+    telegram_send_retries=_int_env("TELEGRAM_SEND_RETRIES", 6),
+    telegram_retry_delay_seconds=_int_env("TELEGRAM_RETRY_DELAY_SECONDS", 60),
 )
 
 

@@ -37,7 +37,13 @@ def register_handlers(bot) -> None:
         run_status = run["status"] if run else "not run today"
         latest = get_latest_report()
         latest_date = latest["report_date"] if latest else "none"
-        status = "OK" if ok else "Needs attention"
+        if ok:
+            status = "OK"
+        elif settings.stop_ollama_after_report:
+            status = "OK"
+            ollama_message = "Ollama is stopped to save RAM. It will start automatically for reports."
+        else:
+            status = "Needs attention"
         bot.reply_to(
             message,
             (

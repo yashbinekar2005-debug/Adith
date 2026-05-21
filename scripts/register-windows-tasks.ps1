@@ -1,18 +1,22 @@
 $ErrorActionPreference = "Stop"
 
 $ProjectRoot = Split-Path -Parent $PSScriptRoot
-$OllamaScript = Join-Path $PSScriptRoot "start-ollama.ps1"
-$AgentScript = Join-Path $PSScriptRoot "start-agent.ps1"
+$LauncherScript = Join-Path $PSScriptRoot "start-background.ps1"
 
 $PowerShell = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
 
-$OllamaAction = New-ScheduledTaskAction -Execute $PowerShell -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$OllamaScript`""
-$AgentAction = New-ScheduledTaskAction -Execute $PowerShell -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$AgentScript`""
+$Action = New-ScheduledTaskAction -Execute $PowerShell -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$LauncherScript`""
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
 
-Register-ScheduledTask -TaskName "AI News Agent - Ollama" -Action $OllamaAction -Trigger $Trigger -Settings $Settings -Description "Start Ollama for local AI news agent." -Force
-Register-ScheduledTask -TaskName "AI News Agent - Reporter" -Action $AgentAction -Trigger $Trigger -Settings $Settings -Description "Start local AI news reporter agent." -Force
+$OldTasks = @("AI News Agent - Ollama", "AI News Agent - Reporter")
+foreach ($TaskName in $OldTasks) {
+    if (Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue) {
+        Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false
+    }
+}
 
-Write-Host "Registered startup tasks for Ollama and AI News Agent."
+Register-ScheduledTask -TaskName "AI News Agent" -Action $Action -Trigger $Trigger -Settings $Settings -Description "Start Ollama and the local AI news reporter at Windows login." -Force
+
+Write-Host "Registered startup task: AI News Agent"
 Write-Host "Project root: $ProjectRoot"
